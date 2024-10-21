@@ -1,10 +1,9 @@
 import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder, MinMaxScaler
-from tensorflow.python.ops.gen_batch_ops import batch
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 
-from chemical_brother.RBFNet import RBFNet
+from chemical_brother.rbfnet import RBFNet
 
 
 def main():
@@ -36,17 +35,27 @@ def main():
         data_scaled, encoded_labels, test_size=0.2
     )
 
-    model = RBFNet(output_dim=7)
+    model = RBFNet(output_dim=7, gamma=0.05)
     model.compile(
-        optimizer=tf.keras.optimizers.Lion(learning_rate=0.001),
+        optimizer=tf.keras.optimizers.Lion(learning_rate=0.01),
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"],
     )
-    model.fit(data_scaled_train, labels_train, epochs=100, batch_size=128)
+    model.fit(data_scaled_train, labels_train, epochs=1000, batch_size=128)
     predictions = model.predict(data_scaled_test)
-    print(predictions)
+    # print(predictions)
 
     model.evaluate(data_scaled_test, labels_test)
+
+    centers = model.rbf_layer.centers.numpy()
+    import matplotlib.pyplot as plt
+
+    plt.imshow(centers, cmap="seismic", interpolation="nearest")
+    plt.colorbar()
+    plt.xlabel("Features")
+    plt.ylabel("Classes")
+    plt.show()
+    # print(centers)
 
 
 if __name__ == "__main__":
