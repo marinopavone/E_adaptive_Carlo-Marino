@@ -1,7 +1,7 @@
 from tensorflow.keras.models import Model
 from tensorflow.keras import layers
 
-from chemical_brother.rbflayer import RBFLayer
+from chemical_brother.RBF.rbflayer import RBFLayer
 
 
 class RBFNet(Model):

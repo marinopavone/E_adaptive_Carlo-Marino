@@ -1,30 +1,35 @@
 import itertools
+import os
 
 import numpy as np
-import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder, MinMaxScaler
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+import matplotlib.pyplot as plt
 
-from chemical_brother.adaptive_rbfnet import AdaptiveRBFNet
+from chemical_brother.AdaptiveRBF.adaptive_rbfnet import AdaptiveRBFNet
+from chemical_brother.data_maker import DataMaker, ChemicalClass
 
 
 def main():
-    chemical_sensors = pd.read_csv("chemical_brother/chemical_sensors.csv")
-    names = [
-        "OFFCHIP_GOLD_78kHz_IN-PHASE",
-        "OFFCHIP_PLATINUM_200Hz_IN-PHASE",
-        "OFFCHIP_PLATINUM_200Hz_QUADRATURE",
-        "OFFCHIP_GOLD_200Hz_IN-PHASE",
-        "OFFCHIP_GOLD_200Hz_QUADRATURE",
-        "OFFCHIP_SILVER_200Hz_IN-PHASE",
-        "OFFCHIP_SILVER_200Hz_QUADRATURE",
-        "OFFCHIP_NICKEL_200Hz_IN-PHASE",
-        "OFFCHIP_NICKEL_200Hz_QUADRATURE",
-    ]
-    data = chemical_sensors[names].to_numpy()
+    # chemical_sensors = pd.read_csv("chemical_brother/chemical_sensors.csv")
+    for file in os.scandir("figures/"):
+        if file.is_file():
+            os.unlink(file.path)
+
+    data_maker = DataMaker("dataset/")
+    data_maker.set_contamination_classes(
+        [
+            ChemicalClass.ETHANOL,
+            ChemicalClass.NELSEN,
+            ChemicalClass.POTABLE_WATER,
+        ]
+    )
+    chemical_sensors = data_maker.make_steady_state_dataset(200)
 
     labels = chemical_sensors[["CLASS"]].to_numpy()
+    data = chemical_sensors.drop(columns=["CLASS"]).to_numpy()
+    names = chemical_sensors.drop(columns=["CLASS"]).columns.to_numpy()
 
     scaler = MinMaxScaler()
     label_encoder = LabelEncoder()
@@ -37,9 +42,11 @@ def main():
         data_scaled, encoded_labels, test_size=0.2, random_state=32
     )
 
-    model = AdaptiveRBFNet(output_dim=7, initial_gamma=0.5)
+    model = AdaptiveRBFNet(
+        output_dim=label_encoder.classes_.shape[0], initial_gamma=0.1
+    )
     model.compile(
-        optimizer=tf.keras.optimizers.Lion(learning_rate=0.001),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"],
     )
@@ -52,8 +59,6 @@ def main():
     centers = model.adaptive_rbf_layer.centers.numpy()
     gamma = model.adaptive_rbf_layer.gamma.numpy()
 
-    import matplotlib.pyplot as plt
-
     plt.imshow(centers, cmap="seismic", interpolation="nearest")
     plt.colorbar()
     plt.xlabel("Features")
@@ -63,7 +68,7 @@ def main():
     combinations = list(itertools.combinations(range(centers.shape[1]), 2))
     for combination in combinations:
         plt.figure(figsize=(10, 8))
-        for class_index in range(7):
+        for class_index in range(label_encoder.classes_.shape[0]):
             class_data = data_scaled_train[labels_train == class_index]
             plt.scatter(
                 class_data[:, combination[0]],
@@ -96,7 +101,7 @@ def main():
         plt.legend()
         # plt.show()
         plt.savefig(
-            f"class_centers_{names[combination[0]]}_{names[combination[1]]}.png",
+            f"figures/class_centers_{names[combination[0]]}_{names[combination[1]]}.png",
             dpi=300,
         )
 

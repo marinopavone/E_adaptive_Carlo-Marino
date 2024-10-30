@@ -3,7 +3,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
-from chemical_brother.rbfnet import RBFNet
+from chemical_brother.RBF.rbfnet import RBFNet
 
 
 def main():
