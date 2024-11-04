@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 from chemical_brother.AdaptiveRBF.adaptive_rbfnet import AdaptiveRBFNet
 from chemical_brother.data_maker import DataMaker, ChemicalClass
+from chemical_brother.loss import silhouette_loss, soft_silhouette_loss
 
 
 def main():
@@ -20,12 +21,12 @@ def main():
     data_maker = DataMaker("dataset/")
     data_maker.set_contamination_classes(
         [
-            ChemicalClass.ETHANOL,
-            ChemicalClass.NELSEN,
-            ChemicalClass.POTABLE_WATER,
+            ChemicalClass.SODIUM_HYDROXIDE,
+            ChemicalClass.SODIUM_CHLORIDE,
+            ChemicalClass.SODIUM_HYPOCHLORITE,
         ]
     )
-    chemical_sensors = data_maker.make_steady_state_dataset(200)
+    chemical_sensors = data_maker.make_steady_state_dataset(500)
 
     labels = chemical_sensors[["CLASS"]].to_numpy()
     data = chemical_sensors.drop(columns=["CLASS"]).to_numpy()
@@ -43,14 +44,14 @@ def main():
     )
 
     model = AdaptiveRBFNet(
-        output_dim=label_encoder.classes_.shape[0], initial_gamma=0.1
+        output_dim=label_encoder.classes_.shape[0], initial_gamma=1.0
     )
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-        loss="sparse_categorical_crossentropy",
+        optimizer=tf.keras.optimizers.Lion(learning_rate=0.0001),
+        loss=silhouette_loss,
         metrics=["accuracy"],
     )
-    model.fit(data_scaled_train, labels_train, epochs=100, batch_size=128)
+    model.fit(data_scaled_train, labels_train, epochs=100, batch_size=256)
     # predictions = model.predict(data_scaled_test)
     # print(predictions)
 
@@ -99,11 +100,11 @@ def main():
         plt.xlabel(f"{names[combination[0]]}")
         plt.ylabel(f"{names[combination[1]]}")
         plt.legend()
-        # plt.show()
         plt.savefig(
             f"figures/class_centers_{names[combination[0]]}_{names[combination[1]]}.png",
             dpi=300,
         )
+        plt.show()
 
 
 # print(centers)
