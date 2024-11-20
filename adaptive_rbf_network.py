@@ -26,7 +26,7 @@ def main():
             ChemicalClass.SODIUM_HYPOCHLORITE,
         ]
     )
-    chemical_sensors = data_maker.make_steady_state_dataset(500)
+    chemical_sensors = data_maker.make_steady_state_dataset(700)
 
     labels = chemical_sensors[["CLASS"]].to_numpy()
     data = chemical_sensors.drop(columns=["CLASS"]).to_numpy()
@@ -47,11 +47,11 @@ def main():
         output_dim=label_encoder.classes_.shape[0], initial_gamma=1.0
     )
     model.compile(
-        optimizer=tf.keras.optimizers.Lion(learning_rate=0.0001),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
         loss=silhouette_loss,
         metrics=["accuracy"],
     )
-    model.fit(data_scaled_train, labels_train, epochs=100, batch_size=256)
+    model.fit(data_scaled_train, labels_train, epochs=1000, batch_size=256)
     # predictions = model.predict(data_scaled_test)
     # print(predictions)
 

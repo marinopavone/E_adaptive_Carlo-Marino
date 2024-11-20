@@ -40,7 +40,7 @@ def silhouette_loss(y_true, y_pred):
     )
 
     # Return the negative silhouette score as the loss
-    return -silhouette
+    return 1.0 - silhouette
 
 
 def soft_silhouette_loss(y_true, y_pred, alpha=1.0):

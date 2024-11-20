@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from random import randint
 
 import pandas as pd
 
@@ -30,7 +31,7 @@ class DataMaker:
     def make_full_dataset(self) -> pd.DataFrame:
         data = pd.DataFrame()
         for file_name in os.listdir(self.folder_path):
-            if file_name.split(".")[0] not in self.classes:
+            if file_name.split(".")[0][:-2] not in self.classes:
                 continue
             df = pd.read_csv(os.path.join(self.folder_path, file_name))
             data = pd.concat([data, df])
@@ -45,6 +46,27 @@ class DataMaker:
             df = df[steady_state_index:]
             data = pd.concat([data, df])
         return data
+
+    def make_train_test_experiments(
+        self, test_experiments: int, steady_state_index: int
+    ):
+        train_data = pd.DataFrame()
+        test_data = pd.DataFrame()
+
+        test_counter = {i: 0 for i in self.classes}
+        for file_name in os.listdir(self.folder_path):
+            if file_name.split(".")[0][:-2] not in self.classes:
+                continue
+            df = pd.read_csv(os.path.join(self.folder_path, file_name))
+            df = df[steady_state_index:]
+            r = randint(0, 10)
+            if (test_counter[df["CLASS"].iloc[0]] < test_experiments) and (r < 5):
+                test_counter[df["CLASS"].iloc[0]] += 1
+                test_data = pd.concat([test_data, df])
+            else:
+                train_data = pd.concat([train_data, df])
+
+        return train_data, test_data
 
     def set_contamination_classes(self, classes: list[ChemicalClass] | None = None):
         self.classes = [c.value for c in classes]
