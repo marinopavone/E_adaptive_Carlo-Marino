@@ -12,22 +12,26 @@ class DeepClustering(Model):
         super(DeepClustering, self).__init__()
         self.encoder = tf.keras.Sequential(
             [
+                layers.Dense(128, activation="relu"),
+                layers.Dense(64, activation="relu"),
                 layers.Dense(32, activation="relu"),
-                layers.Dense(16, activation="relu"),
-                layers.Dense(8, activation="relu"),
+                layers.Dense(n_classes, activation="relu"),
             ]
         )
 
         self.decoder = tf.keras.Sequential(
             [
-                layers.Dense(16, activation="relu"),
                 layers.Dense(32, activation="relu"),
-                layers.Dense(reconstrunction_dim, activation="relu"),
+                layers.Dense(64, activation="relu"),
+                layers.Dense(128, activation="relu"),
+                layers.Dense(reconstrunction_dim, activation="sigmoid"),
             ]
         )
 
         self.rbf_layer = AdaptiveRBFLayer(
-            num_centers=n_classes * centroids_per_class, activation="softmax"
+            num_centers=n_classes * centroids_per_class,
+            initial_gamma=1.0,
+            activation="softmax",
         )
 
     def call(self, x):

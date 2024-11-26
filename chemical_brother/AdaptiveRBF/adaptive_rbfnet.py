@@ -8,7 +8,7 @@ class AdaptiveRBFNet(Model):
     def __init__(self, output_dim=10, initial_gamma=0.1):
         super().__init__()
         self.adaptive_rbf_layer = AdaptiveRBFLayer(
-            num_centers=output_dim, initial_gamma=initial_gamma
+            num_centers=output_dim, initial_gamma=initial_gamma, activation=None
         )
         # self.dense = layers.Dense(units=output_dim, activation="sigmoid")
 
