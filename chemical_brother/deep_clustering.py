@@ -15,7 +15,7 @@ class DeepClustering(Model):
                 layers.Dense(128, activation="relu"),
                 layers.Dense(64, activation="relu"),
                 layers.Dense(32, activation="relu"),
-                layers.Dense(n_classes, activation="relu"),
+                layers.Dense(n_classes, activation="linear"),
             ]
         )
 
@@ -31,7 +31,7 @@ class DeepClustering(Model):
         self.rbf_layer = AdaptiveRBFLayer(
             num_centers=n_classes * centroids_per_class,
             initial_gamma=1.0,
-            activation="softmax",
+            activation=None,
         )
 
     def call(self, x):

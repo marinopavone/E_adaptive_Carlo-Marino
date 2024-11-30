@@ -8,7 +8,7 @@ from chemical_brother.data_maker import DataMaker, ChemicalClass
 from chemical_brother.deep_clustering import DeepClustering
 import tensorflow as tf
 
-from chemical_brother.loss import silhouette_loss
+from chemical_brother.loss import SilhouetteLoss
 
 
 def main():
@@ -55,16 +55,16 @@ def main():
 
     deep_clustering_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
-        loss=["sparse_categorical_crossentropy", "mae"],
+        loss=[SilhouetteLoss(), "mae"],
+        loss_weights=[0.2, 0.8],
         metrics=["accuracy", "mse"],
     )
 
     deep_clustering_model.summary()
-
     deep_clustering_model.fit(
         x_train,
         [y_train, x_train],
-        epochs=5,
+        epochs=10,
         batch_size=64,
         validation_data=(x_test, [y_test, x_test]),
     )
@@ -76,6 +76,8 @@ def main():
 
     centers = deep_clustering_model.rbf_layer.centers.numpy()
     gamma = deep_clustering_model.rbf_layer.gamma.numpy()
+
+    clust, rec = deep_clustering_model.predict(x_test)
 
     plt.imshow(centers, cmap="seismic", interpolation="nearest")
     plt.colorbar()

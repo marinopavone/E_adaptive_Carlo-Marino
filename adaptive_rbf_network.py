@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 from chemical_brother.AdaptiveRBF.adaptive_rbfnet import AdaptiveRBFNet
 from chemical_brother.data_maker import DataMaker, ChemicalClass
-from chemical_brother.loss import silhouette_loss, soft_silhouette_loss
+from chemical_brother.loss import silhouette_loss, soft_silhouette_loss, SilhouetteLoss
 
 
 def main():
@@ -48,7 +48,7 @@ def main():
     )
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-        loss=silhouette_loss,
+        loss=SilhouetteLoss(),
         metrics=["accuracy"],
     )
     model.fit(data_scaled_train, labels_train, epochs=1000, batch_size=256)
