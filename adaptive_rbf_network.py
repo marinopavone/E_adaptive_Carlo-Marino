@@ -3,13 +3,14 @@ import os
 
 import numpy as np
 import tensorflow as tf
+import umap
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 import matplotlib.pyplot as plt
 
 from chemical_brother.AdaptiveRBF.adaptive_rbfnet import AdaptiveRBFNet
 from chemical_brother.data_maker import DataMaker, ChemicalClass
-from chemical_brother.loss import silhouette_loss, soft_silhouette_loss, SilhouetteLoss
+from chemical_brother.loss import SilhouetteLoss, CorelLoss
 
 
 def main():
@@ -39,6 +40,10 @@ def main():
 
     encoded_labels = label_encoder.fit_transform(labels)
 
+    n_neighbors = 100
+    umap_reducer = umap.UMAP(n_components=4, n_neighbors=n_neighbors, n_jobs=-1)
+    data_scaled = umap_reducer.fit_transform(data_scaled)
+
     data_scaled_train, data_scaled_test, labels_train, labels_test = train_test_split(
         data_scaled, encoded_labels, test_size=0.2, random_state=32
     )
@@ -48,7 +53,7 @@ def main():
     )
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
-        loss=SilhouetteLoss(),
+        loss="categorical_crossentropy",
         metrics=["accuracy"],
     )
     model.fit(data_scaled_train, labels_train, epochs=1000, batch_size=256)

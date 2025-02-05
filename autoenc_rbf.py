@@ -64,7 +64,7 @@ def main():
     deep_clustering_model.fit(
         x_train,
         [y_train, x_train],
-        epochs=10,
+        epochs=100,
         batch_size=64,
         validation_data=(x_test, [y_test, x_test]),
     )

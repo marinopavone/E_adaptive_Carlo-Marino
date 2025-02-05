@@ -15,7 +15,7 @@ class DeepClustering(Model):
                 layers.Dense(128, activation="relu"),
                 layers.Dense(64, activation="relu"),
                 layers.Dense(32, activation="relu"),
-                layers.Dense(n_classes, activation="linear"),
+                layers.Dense(4, activation="linear"),
             ]
         )
 
