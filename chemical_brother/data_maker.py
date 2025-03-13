@@ -69,7 +69,7 @@ class DataMaker:
 
         return train_data, test_data
 
-    def split_train_test_by_experiment(self, test_experiments: list, steady_state_index: int):
+    def split_train_test_by_experiment(self, test_experiments: list, stady_state_start, stady_state_end):
         train_data = pd.DataFrame()
         test_data = pd.DataFrame()
 
@@ -79,7 +79,7 @@ class DataMaker:
             if file_name.split(".")[0][:-2] not in self.classes:
                 continue
             df = pd.read_csv(os.path.join(self.folder_path, file_name))
-            df = df[steady_state_index:]
+            df = df[stady_state_start:stady_state_end]
             if file_name.split(".")[0][-1] in test_experiments_list:
                 test_data = pd.concat([test_data, df])
             else:
