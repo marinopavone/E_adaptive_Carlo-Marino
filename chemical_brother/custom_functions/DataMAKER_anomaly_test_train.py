@@ -2,7 +2,6 @@ from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.decomposition import PCA
 from sklearn.decomposition import KernelPCA
 from chemical_brother.data_maker import DataMaker, ChemicalClass
-from chemical_brother.Contractive_autoencoder import generate_contractive_autoenc
 import numpy as np
 import pandas as pd
 import umap
@@ -20,10 +19,14 @@ known_sub.set_contamination_classes(
     [
         ChemicalClass.SODIUM_HYDROXIDE,
         ChemicalClass.SODIUM_CHLORIDE,
-        ChemicalClass.SODIUM_HYPOCHLORITE,
-        ChemicalClass.POTASSIUM_NITRATE,
-        ChemicalClass.CALCIUM_NITRATE,
-
+        ChemicalClass.FORMIC_ACID,
+        ChemicalClass.HYDROCHLORIC_ACID,
+        ChemicalClass.HYDROGEN_PEROXIDE,
+        ChemicalClass.ACETONE,
+        ChemicalClass.ACETIC_ACID,
+        ChemicalClass.POTABLE_WATER,
+        ChemicalClass.NELSEN,
+        ChemicalClass.PHOSPHORIC_ACID,
     ]
 )
 #%%   Dataset anomaly substances
@@ -31,14 +34,9 @@ known_sub.set_contamination_classes(
 anomaly_sub = DataMaker("/Users/marinopavone/PycharmProjects/E_adaptive_Carlo-Marino/dataset")
 anomaly_sub.set_contamination_classes(
     [
-        ChemicalClass.POTABLE_WATER,
-        ChemicalClass.NELSEN,
-        ChemicalClass.PHOSPHORIC_ACID,
-        ChemicalClass.FORMIC_ACID,
-        ChemicalClass.HYDROCHLORIC_ACID,
-        ChemicalClass.HYDROGEN_PEROXIDE,
-        ChemicalClass.ACETONE,
-        ChemicalClass.ACETIC_ACID,
+        ChemicalClass.SODIUM_HYPOCHLORITE,
+        ChemicalClass.POTASSIUM_NITRATE,
+        ChemicalClass.CALCIUM_NITRATE,
         ChemicalClass.ETHANOL,
         ChemicalClass.AMMONIA,
     ]
