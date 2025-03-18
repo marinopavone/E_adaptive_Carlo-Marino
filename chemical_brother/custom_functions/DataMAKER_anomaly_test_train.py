@@ -24,9 +24,7 @@ known_sub.set_contamination_classes(
         ChemicalClass.HYDROGEN_PEROXIDE,
         ChemicalClass.ACETONE,
         ChemicalClass.ACETIC_ACID,
-        ChemicalClass.POTABLE_WATER,
-        ChemicalClass.NELSEN,
-        ChemicalClass.PHOSPHORIC_ACID,
+
     ]
 )
 #%%   Dataset anomaly substances
@@ -37,12 +35,16 @@ anomaly_sub.set_contamination_classes(
         ChemicalClass.SODIUM_HYPOCHLORITE,
         ChemicalClass.POTASSIUM_NITRATE,
         ChemicalClass.CALCIUM_NITRATE,
+        ChemicalClass.POTABLE_WATER,
+        ChemicalClass.NELSEN,
+        ChemicalClass.PHOSPHORIC_ACID,
+
         ChemicalClass.ETHANOL,
         ChemicalClass.AMMONIA,
     ]
 )
 
-test_experiment_selection=[1,3,5]
+test_experiment_selection=[1,3,5]  # seleziono quale dei 10 fold usare come test (gli altri andranno come training)
 stady_state_start,stady_state_end = 500,800
 train, test = known_sub.split_train_test_by_experiment(test_experiment_selection, stady_state_start,stady_state_end)
 x_train = train.drop(columns=["CLASS"]).to_numpy()

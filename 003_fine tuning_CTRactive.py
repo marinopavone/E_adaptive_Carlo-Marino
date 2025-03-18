@@ -14,24 +14,12 @@ y_test          = loaded_variables['y_test'        ]
 x_anomaly       = loaded_variables['x_anomaly']
 y_anomaly       = loaded_variables['y_anomaly']
 
-#%%   extracting PCA transformation
-from sklearn.decomposition import KernelPCA, PCA
-# Set number of principal components
-n_components = 6
 
-# Apply Kernel PCA with RBF kernel
-# pca = KernelPCA(n_components=n_components, kernel='linear')  # gamma controls kernel width
-pca = PCA(n_components=n_components)  # gamma controls kernel width
-
-# Fit and transform the training data
-x_train = pca.fit_transform(x_train)
-x_test  = pca.transform(x_test)
-# x_anomaly = pca.transform(x_anomaly)
-
+#%%   tuning
 # Define the hyperparameter grid
-num_epochs_list = [500]  # Different epoch values
-batch_size_list = [512,4096*3] #[512,1024,2048,4096]
-learning_rate_list = [ 0.05, 0.3, 0.7]#[0.001, 0.01, 0.1]
+num_epochs_list = [2000]  # Different epoch values
+batch_size_list = [ 16800] #[512,1024,2048,4096]
+learning_rate_list = [ 0.0001, 0.001, 0.01, 0.1]
 
 Lambda = [0.001, 0.01, 1, 5 ]
 

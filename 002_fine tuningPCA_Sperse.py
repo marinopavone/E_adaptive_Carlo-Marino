@@ -14,11 +14,25 @@ y_test          = loaded_variables['y_test'        ]
 x_anomaly       = loaded_variables['x_anomaly']
 y_anomaly       = loaded_variables['y_anomaly']
 
-#%%   tuning
+#%%   extracting PCA transformation
+from sklearn.decomposition import KernelPCA, PCA
+# Set number of principal components
+n_components = 6
+
+# Apply Kernel PCA with RBF kernel
+# pca = KernelPCA(n_components=n_components, kernel='linear')  # gamma controls kernel width
+pca = PCA(n_components=n_components)  # gamma controls kernel width
+
+# Fit and transform the training data
+x_train = pca.fit_transform(x_train)
+x_test  = pca.transform(x_test)
+# x_anomaly = pca.transform(x_anomaly)
+
+
 # Define the hyperparameter grid
-num_epochs_list = [2000]  # Different epoch values
-batch_size_list = [ 16800] #[512,1024,2048,4096]
-learning_rate_list = [ 0.0001, 0.001, 0.01, 0.1]
+num_epochs_list = [1000]  # Different epoch values
+batch_size_list = [8400] #[512,1024,2048,4096]
+learning_rate_list = [ 0.0007, 0.005, 0.01]#[0.001, 0.01, 0.1]
 momentum = 0.07
 # Lambda = [0.001, 0.01, 1, 5 ]
 beta_list=[0.005, 0.05, 0.3 ]
@@ -48,8 +62,5 @@ print("# _______________________________________________________ Contractive aut
 
 print("Best Parameters:", best_params)
 print("Best Loss:", best_loss)
-best_model.save("Tensorflow_models/CDC_autoencoders/BEST_Spa_model_" + str(best_params) + ".keras")
+best_model.save("Tensorflow_models/CDC_autoencoders/Spa_model_" + str(best_params) + ".keras")
 
-print("awrb")
-print("\n")
-print("awrb")

@@ -14,6 +14,19 @@ y_test          = loaded_variables['y_test'        ]
 x_anomaly       = loaded_variables['x_anomaly']
 y_anomaly       = loaded_variables['y_anomaly']
 
+#%%   extracting PCA transformation
+from sklearn.decomposition import KernelPCA, PCA
+# Set number of principal components
+n_components = 6
+
+# Apply Kernel PCA with RBF kernel
+# pca = KernelPCA(n_components=n_components, kernel='linear')  # gamma controls kernel width
+pca = PCA(n_components=n_components)  # gamma controls kernel width
+
+# Fit and transform the training data
+x_train = pca.fit_transform(x_train)
+x_test  = pca.transform(x_test)
+# x_anomaly = pca.transform(x_anomaly)
 
 #%%   tuning
 # Define the hyperparameter grid
@@ -35,7 +48,7 @@ from itertools import product
 # _______________________________________________________ Normal
 for num_epochs, batch_size, learning_rate, momentum in product(num_epochs_list, batch_size_list, learning_rate_list, momentum):
     model, loss = autoencoder_training(x_train, num_epochs, batch_size, learning_rate, momentum)
-    print(f"Training with epochs={num_epochs}, batch_size={batch_size}, lr={learning_rate}, momentum={momentum}, loss={loss}")
+    print(f"Training with epochs={num_epochs}, batch_size={batch_size}, lr={learning_rate}, loss={loss}")
 
     if loss < best_loss:
         best_loss = loss

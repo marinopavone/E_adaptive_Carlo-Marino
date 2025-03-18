@@ -1,3 +1,4 @@
+import pandas as pd
 import tensorflow as tf
 import numpy as np
 
@@ -12,14 +13,16 @@ def KL_divergence(rho, rho_hat):
 class AutoEncoder(tf.keras.Model):
     def __init__(self):
         super(AutoEncoder, self).__init__()
+
+        peppe=6
         self.flatten_layer = tf.keras.layers.Flatten()
-        self.dense_dec = tf.keras.layers.Dense(6, activation=tf.nn.relu)
+        self.dense_dec = tf.keras.layers.Dense(peppe, activation=tf.nn.relu)
 
         self.bottleneck = tf.keras.layers.Dense(3, activation=tf.nn.relu)
 
-        self.dense_enc = tf.keras.layers.Dense(6, activation=tf.nn.relu)
+        self.dense_enc = tf.keras.layers.Dense(peppe, activation=tf.nn.relu)
 
-        self.dense_final = tf.keras.layers.Dense(6)
+        self.dense_final = tf.keras.layers.Dense(peppe)
 
     def call(self, inp):
         x_reshaped = self.flatten_layer(inp)
@@ -63,6 +66,7 @@ def Spa_loss(x, x_bar, h, model, beta=0.1, rho=0.05):
 def grads(model, inputs):
     with tf.GradientTape() as tape:
         reconstruction, inputs_reshaped, hidden = model(inputs)
+        # reconstruction, inputs_reshaped, hidden = model.bottleneck(inputs)
         loss_value = loss(inputs_reshaped, reconstruction, hidden, model)
     return loss_value, tape.gradient(loss_value, model.trainable_variables), inputs_reshaped, reconstruction
 
@@ -149,6 +153,9 @@ def compare_autoencoders(Nrm_model, CTR_model, x_test, y_test):
 
     loss_dict = {}
 
+    nrm_global_loss = list()
+    ctr_global_loss = list()
+
     print("\nReconstruction Loss Comparison per Class:\n")
     for cls in classes:
         # Get indices for current class
@@ -157,10 +164,13 @@ def compare_autoencoders(Nrm_model, CTR_model, x_test, y_test):
         # Compute average loss for this class
         nrm_avg_loss = np.mean(nrm_loss[cls_indices])
         ctr_avg_loss = np.mean(ctr_loss[cls_indices])
+        nrm_global_loss.append(nrm_avg_loss)
+        ctr_global_loss.append(ctr_avg_loss)
 
         loss_dict[cls] = {"Nrm_model_loss": nrm_avg_loss, "CTR_model_loss": ctr_avg_loss}
 
         print(f"Class {cls}: Nrm_model Loss = {nrm_avg_loss:.6f}, CTR_model Loss = {ctr_avg_loss:.6f}")
+    print(f"Global : Nrm_model Loss = {np.mean(nrm_global_loss):.6f}, CTR_model Loss = {np.mean(ctr_global_loss):.6f}")
 
     return loss_dict
 
@@ -181,6 +191,9 @@ def compare_3_autoencoders(Nrm_model, CTR_model, Spa_model, x_test, y_test):
     classes = np.unique(y_test)
 
     loss_dict = {}
+    nrm_global_loss = list()
+    ctr_global_loss = list()
+    spa_global_loss = list()
 
     print("\nReconstruction Loss Comparison per Class:\n")
     for cls in classes:
@@ -192,14 +205,18 @@ def compare_3_autoencoders(Nrm_model, CTR_model, Spa_model, x_test, y_test):
         ctr_avg_loss = np.mean(ctr_loss[cls_indices])
         spa_avg_loss = np.mean(spa_loss[cls_indices])
 
+        nrm_global_loss.append(nrm_avg_loss)
+        ctr_global_loss.append(ctr_avg_loss)
+        spa_global_loss.append(spa_avg_loss)
+
         loss_dict[cls] = {
             "Nrm_model_loss": nrm_avg_loss,
             "CTR_model_loss": ctr_avg_loss,
             "Spa_model_loss": spa_avg_loss
         }
-
         print(f"Class {cls}: Nrm_model Loss = {nrm_avg_loss:.6f}, CTR_model Loss = {ctr_avg_loss:.6f}, Spa_model Loss = {spa_avg_loss:.6f}")
-
+    print("")
+    print(f"Global : Nrm_model Loss = {np.mean(nrm_global_loss):.6f}, CTR_model Loss = {np.mean(ctr_global_loss):.6f}, Spa_model Loss = {np.mean(spa_global_loss):.6f}")
     return loss_dict
 
 

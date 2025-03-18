@@ -51,7 +51,7 @@ if retrain:
     # best_model.save("Tensorflow_models/CDC_autoencoders/BEST_Spa_model_" + str(best_params) + ".keras")
 else:
     from keras.models import load_model
-    Spa_model = load_model("Tensorflow_models/CDC_autoencoders/BEST_Spa_model_None.keras",
+    Spa_model = load_model("Tensorflow_models/CDC_autoencoders/BEST_PCA_Spa_model_None.keras",
                            custom_objects={'AutoEncoder': AutoEncoder})
     # Nrm_model = load_model("Tensorflow_models/CDC_autoencoders/BEST_Spa_model_" + str(best_params) + ".keras",
     #                        custom_objects={'AutoEncoder': AutoEncoder})
