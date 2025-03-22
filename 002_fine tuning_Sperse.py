@@ -19,10 +19,13 @@ y_anomaly       = loaded_variables['y_anomaly']
 num_epochs_list = [2000]  # Different epoch values
 batch_size_list = [ 16800] #[512,1024,2048,4096]
 learning_rate_list = [ 0.0001, 0.001, 0.01, 0.1]
+# learning_rate_list = [ 0.1]
 momentum = 0.07
 # Lambda = [0.001, 0.01, 1, 5 ]
 beta_list=[0.005, 0.05, 0.3 ]
 rho_list=[0.005, 0.05, 0.3 ]
+# beta_list=[0.005 ]
+# rho_list=[0.005 ]
 # beta_list=[0.0001, 0.001, 0.01, 0.1, 1]
 # rho_list=[0.0001, 0.001, 0.01, 0.1, 1]
 

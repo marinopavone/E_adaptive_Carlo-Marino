@@ -8,7 +8,7 @@ import tensorflow as tf
 import numpy as np
 #%%   Dataset building
 
-data_maker = DataMaker("dataset/")
+data_maker = DataMaker("../dataset/")
 data_maker.set_contamination_classes(
     [
         ChemicalClass.SODIUM_HYDROXIDE,

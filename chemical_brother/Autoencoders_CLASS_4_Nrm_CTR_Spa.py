@@ -2,6 +2,9 @@ import pandas as pd
 import tensorflow as tf
 import numpy as np
 
+tf.random.set_seed(42)
+
+
 def KL_divergence(rho, rho_hat):
     """ Compute KL divergence loss to enforce sparsity """
     rho_hat = tf.clip_by_value(rho_hat, 1e-10, 1.0)  # Avoid log(0)
@@ -13,6 +16,7 @@ def KL_divergence(rho, rho_hat):
 class AutoEncoder(tf.keras.Model):
     def __init__(self):
         super(AutoEncoder, self).__init__()
+        tf.random.set_seed(41)
 
         peppe=6
         self.flatten_layer = tf.keras.layers.Flatten()
@@ -38,9 +42,38 @@ class AutoEncoder(tf.keras.Model):
         return {}
     @classmethod
     def from_config(cls, config):
-        return cls()
-# define loss function and gradient
-# define loss function and gradient
+        return cls(**config)
+
+#
+# class AutoEncoder_PCA(tf.keras.Model):
+#     def __init__(self):
+#         super(AutoEncoder_PCA, self).__init__()
+#
+#         peppe=6
+#         self.flatten_layer = tf.keras.layers.Flatten()
+#         self.dense_dec = tf.keras.layers.Dense(peppe, activation=tf.nn.relu)
+#
+#         self.bottleneck = tf.keras.layers.Dense(3, activation=tf.nn.relu)
+#
+#         self.dense_enc = tf.keras.layers.Dense(peppe, activation=tf.nn.relu)
+#
+#         self.dense_final = tf.keras.layers.Dense(peppe)
+#
+#     def call(self, inp):
+#         x_reshaped = self.flatten_layer(inp)
+#         # print(x_reshaped.shape)
+#         x = self.dense_dec(x_reshaped)
+#         x = self.bottleneck(x)
+#         x_hid = x
+#         x = self.dense_enc(x)
+#         x = self.dense_final(x)
+#         return x, x_reshaped, x_hid
+#     # ONLY FOR SAVINGGGGGGG  ✅ Make the model serializable scrivo anche get_config e from_config
+#     def get_config(self):
+#         return {}
+#     @classmethod
+#     def from_config(cls, config):
+#         return cls()
 def loss(x, x_bar, h, model, Lambda=100):
     reconstruction_loss = tf.reduce_mean(tf.keras.losses.mse(x, x_bar))
     W = tf.Variable(model.bottleneck.weights[0])
@@ -110,7 +143,6 @@ def CTR_autoencoder_training(x_train, num_epochs = 200, batch_size = 128,
         for x in range(0, len(x_train), batch_size):
             x_inp = x_train[x: x + batch_size]
             loss_value, grad, inputs_reshaped, reconstruction = CTR_grads(model, x_inp,Lambda)
-            # optimizer.apply_gradients( zip(grads, model.trainable_variables) , global_step )
             optimizer.apply_gradients(zip(grad, model.trainable_variables))
             global_step.assign_add(1)
 

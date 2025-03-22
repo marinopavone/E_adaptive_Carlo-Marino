@@ -12,7 +12,7 @@ from chemical_brother.loss import SilhouetteLoss
 
 
 def main():
-    data_maker = DataMaker("dataset/")
+    data_maker = DataMaker("../dataset/")
     data_maker.set_contamination_classes(
         [
             ChemicalClass.SODIUM_HYDROXIDE,

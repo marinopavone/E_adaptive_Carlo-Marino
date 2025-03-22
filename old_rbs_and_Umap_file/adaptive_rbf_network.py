@@ -15,11 +15,11 @@ from chemical_brother.loss import SilhouetteLoss, CorelLoss
 
 def main():
     # chemical_sensors = pd.read_csv("chemical_brother/chemical_sensors.csv")
-    for file in os.scandir("figures/"):
+    for file in os.scandir("../figures/"):
         if file.is_file():
             os.unlink(file.path)
 
-    data_maker = DataMaker("dataset/")
+    data_maker = DataMaker("../dataset/")
     data_maker.set_contamination_classes(
         [
             ChemicalClass.SODIUM_HYDROXIDE,

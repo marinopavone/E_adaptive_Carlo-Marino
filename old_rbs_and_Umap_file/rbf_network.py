@@ -7,7 +7,7 @@ from chemical_brother.RBF.rbfnet import RBFNet
 
 
 def main():
-    chemical_sensors = pd.read_csv("chemical_brother/chemical_sensors.csv")
+    chemical_sensors = pd.read_csv("../chemical_brother/chemical_sensors.csv")
     data = chemical_sensors[
         [
             "OFFCHIP_GOLD_78kHz_IN-PHASE",

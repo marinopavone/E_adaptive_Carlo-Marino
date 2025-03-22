@@ -20,30 +20,26 @@ y_anomaly       = loaded_variables['y_anomaly']
 num_epochs_list = [2000]  # Different epoch values
 batch_size_list = [ 16800] #[512,1024,2048,4096]
 learning_rate_list = [ 0.0001, 0.001, 0.01, 0.1]
-learning_rate_list = [  0.1]
-momentum = [ 0.0001, 0.001, 0.01, 0.1][::-1]
-momentum = [0.001]
-# Lambda = [0.001, 0.01, 1, 5 ]
-# beta_list=[0.005, 0.05, 0.3 ]
-# rho_list=[0.005, 0.05, 0.3 ]
-# beta_list=[0.0001, 0.001, 0.01, 0.1, 1]
-# rho_list=[0.0001, 0.001, 0.01, 0.1, 1]
+
+Lambda = [0.001, 0.01, 1, 5 ]
 
 best_model = None
 best_loss = float("inf")
 best_params = None
 
 from itertools import product
-# _______________________________________________________ Normal
-for num_epochs, batch_size, learning_rate, momentum in product(num_epochs_list, batch_size_list, learning_rate_list, momentum):
-    model, loss = autoencoder_training(x_train, num_epochs, batch_size, learning_rate, momentum)
-    print(f"Training with epochs={num_epochs}, batch_size={batch_size}, lr={learning_rate}, momentum={momentum}, loss={loss}")
+
+for num_epochs, batch_size, learning_rate, Lambda in product(num_epochs_list, batch_size_list, learning_rate_list, Lambda):
+    model, loss = CTR_autoencoder_training(x_train, num_epochs, batch_size, learning_rate, Lambda)
+    print(f"Training with epochs={num_epochs}, batch_size={batch_size}, lr={learning_rate}, lambda={Lambda}, loss={loss}")
 
     if loss < best_loss:
         best_loss = loss
         best_model = model
-        best_params = (num_epochs, batch_size, learning_rate)
-print("# _______________________________________________________ Normal autoencoder")
+        best_params = (num_epochs, batch_size, learning_rate, Lambda)
+print("# _______________________________________________________ Contractive autoencoder")
+
 print("Best Parameters:", best_params)
 print("Best Loss:", best_loss)
-best_model.save("Tensorflow_models/CDC_autoencoders/Nrm_model_" + str(best_params) + ".keras")
+best_model.save("Tensorflow_models/CDC_autoencoders/CTR_model_" + str(best_params) + ".keras")
+

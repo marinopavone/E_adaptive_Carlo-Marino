@@ -17,14 +17,14 @@ import pickle
 known_sub = DataMaker("/Users/marinopavone/PycharmProjects/E_adaptive_Carlo-Marino/dataset")
 known_sub.set_contamination_classes(
     [
-        ChemicalClass.SODIUM_HYDROXIDE,
-        ChemicalClass.SODIUM_CHLORIDE,
-        ChemicalClass.FORMIC_ACID,
+
+
+        ChemicalClass.CALCIUM_NITRATE,
+
         ChemicalClass.HYDROCHLORIC_ACID,
         ChemicalClass.HYDROGEN_PEROXIDE,
-        ChemicalClass.ACETONE,
-        ChemicalClass.ACETIC_ACID,
-
+        ChemicalClass.ETHANOL,
+        ChemicalClass.AMMONIA,
     ]
 )
 #%%   Dataset anomaly substances
@@ -32,19 +32,24 @@ known_sub.set_contamination_classes(
 anomaly_sub = DataMaker("/Users/marinopavone/PycharmProjects/E_adaptive_Carlo-Marino/dataset")
 anomaly_sub.set_contamination_classes(
     [
-        ChemicalClass.SODIUM_HYPOCHLORITE,
-        ChemicalClass.POTASSIUM_NITRATE,
-        ChemicalClass.CALCIUM_NITRATE,
-        ChemicalClass.POTABLE_WATER,
         ChemicalClass.NELSEN,
-        ChemicalClass.PHOSPHORIC_ACID,
+        ChemicalClass.ACETIC_ACID,
 
-        ChemicalClass.ETHANOL,
-        ChemicalClass.AMMONIA,
+        ChemicalClass.FORMIC_ACID,
+
+        ChemicalClass.POTASSIUM_NITRATE,
+
+
+        ChemicalClass.POTABLE_WATER,
+        ChemicalClass.SODIUM_HYDROXIDE,
+        ChemicalClass.SODIUM_CHLORIDE,
+        ChemicalClass.ACETONE,
+        ChemicalClass.SODIUM_HYPOCHLORITE,
+        ChemicalClass.PHOSPHORIC_ACID,
     ]
 )
 
-test_experiment_selection=[1,3,5]  # seleziono quale dei 10 fold usare come test (gli altri andranno come training)
+test_experiment_selection=[4,8,9]  # seleziono quale dei 10 fold usare come test (gli altri andranno come training)
 stady_state_start,stady_state_end = 500,800
 train, test = known_sub.split_train_test_by_experiment(test_experiment_selection, stady_state_start,stady_state_end)
 x_train = train.drop(columns=["CLASS"]).to_numpy()
@@ -82,8 +87,14 @@ x_anomaly = scaler.transform(x_test)
 y_anomaly = label_encoder_anomaly.transform(anomaly_labels)
 
 #%%   save TRAIN TEST SPLIT DB
+from time import gmtime, strftime
+time_trak= strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
+
+
 print("saving TRAIN TEST ")
-pickle_filename = 'X&Y_train_X&Y_test_X&Y_anomaly.pkl'
+path ='Datasets Pikle/X&Y_ds_created_'
+pickle_filename = path + time_trak + '.pkl'
 data_to_save = {'x_train': x_train,
                 'y_train': y_train,
                 'x_test' : x_test,
@@ -95,3 +106,20 @@ data_to_save = {'x_train': x_train,
 with open(pickle_filename, 'wb') as pickle_file:
     dill.dump(data_to_save, pickle_file)
 
+Dataset_info_file_name = path + time_trak + '.txt'
+with open(Dataset_info_file_name, "w") as f:
+    s = ["First line of text.\n", "Second line of text.\n", "Third line of text.\n"]
+    f.write(f"Substances \n")
+    for i, cls in enumerate(label_encoder.classes_):
+        f.write(f" {i}: = {cls} \n")
+    f.write(f"Anomalies \n")
+    for i, cls in enumerate(label_encoder_anomaly.classes_):
+        f.write(f" {i}: = {cls} \n")
+
+    f.write(f"\n")
+
+    f.write(f"fold for TEST SET: {test_experiment_selection} \n")
+    f.write(f"from sample {stady_state_start} to sample {stady_state_end} \n")
+
+    f.write(f"\n")
+    f.write(f"e mo so cazzi tuoi \n")
