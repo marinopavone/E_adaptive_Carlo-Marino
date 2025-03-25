@@ -18,7 +18,7 @@ class AutoEncoder(tf.keras.Model):
         super(AutoEncoder, self).__init__()
         tf.random.set_seed(41)
 
-        peppe=6
+        peppe=10
         self.flatten_layer = tf.keras.layers.Flatten()
         self.dense_dec = tf.keras.layers.Dense(peppe, activation=tf.nn.relu)
 

@@ -1,15 +1,13 @@
 import itertools
 
 import numpy as np
-from matplotlib import pyplot as plt
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 
-from chemical_brother.data_maker import DataMaker, ChemicalClass
 from chemical_brother.deep_clustering import DeepClustering
 import tensorflow as tf
 from sklearn.metrics import silhouette_samples, silhouette_score
 
-from chemical_brother.loss import SilhouetteLoss
+from chemical_brother.old_stuf_di_carlo.loss import SilhouetteLoss
 
 
 y_true = tf.constant([0, 0, 1, 1, 1, 1], dtype=tf.int32)

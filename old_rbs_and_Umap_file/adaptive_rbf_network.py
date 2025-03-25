@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from chemical_brother.AdaptiveRBF.adaptive_rbfnet import AdaptiveRBFNet
 from chemical_brother.data_maker import DataMaker, ChemicalClass
-from chemical_brother.loss import SilhouetteLoss, CorelLoss
+from chemical_brother.old_stuf_di_carlo.loss import SilhouetteLoss, CorelLoss
 
 
 def main():

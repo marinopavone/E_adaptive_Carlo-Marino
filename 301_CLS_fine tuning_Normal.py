@@ -37,9 +37,9 @@ best_model = None
 best_accuracy = 0
 best_params = None
 
-# model, loss = CLS_autoencoder_training(x_train, y_train, num_epochs=2000,
-#                                         batch_size=1000, learning_rate=0.001, momentum=0.9,
-#                                         num_classes=y_train.shape[1], hidden_units=10, bottleneck_units=5)
+old_bes_model, loss = CLS_autoencoder_training(x_train, y_train, num_epochs=3000,
+                                        batch_size=8400, learning_rate=0.2, momentum=0.001,
+                                        num_classes=y_train.shape[1], hidden_units=10, bottleneck_units=5)
 # test_CLS_Autoencoder(model, x_test, y_test)
 # model.save("Tensorflow_models/CDC_autoencoders/first_CLS.keras")
 

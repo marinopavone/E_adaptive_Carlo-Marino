@@ -1,5 +1,5 @@
-import numpy as np
 import pickle
+
 from chemical_brother.Autoencoders_CLASS_4_Nrm_CTR_Spa import *
 
 #%%    load data

@@ -96,6 +96,20 @@ def loss(x, x_bar, y, x_class, model, lambda_rec=1.0, lambda_class=0.3):
     return total_loss
 
 
+def CTR_loss(x, x_bar, y, x_class, model, h, lambda_rec=1.0, lambda_class=0.3, lambda_CTR=0.01):
+    reconstruction_loss = tf.reduce_mean(tf.keras.losses.mse(x, x_bar))
+    W = tf.Variable(model.bottleneck.weights[0])
+    dh = h * (1 - h)  # N_batch x N_hidden
+    W = tf.transpose(W)
+    # contractive = Lambda * tf.reduce_sum(tf.linalg.matmul(dh ** 2, tf.square(W)), axis=1)
+    batch_size = tf.cast(tf.shape(x)[0], tf.float32)
+    classification_loss = tf.reduce_mean(tf.keras.losses.categorical_crossentropy(y, x_class))
+    contractive = tf.reduce_mean(tf.linalg.matmul(dh ** 2, tf.square(W)), axis=1) / batch_size
+    total_loss = lambda_rec * reconstruction_loss + lambda_class * classification_loss + lambda_CTR * contractive
+    return total_loss
+
+
+
 # Gradient computation
 def grads(model, inputs, labels):
     with tf.GradientTape() as tape:
@@ -105,13 +119,22 @@ def grads(model, inputs, labels):
                                      model.trainable_variables), inputs_reshaped, reconstruction, classification
 
 
-# Training function
+def CTR_grads(model, inputs, lables, lambda_rec=0.01, lambda_cla=0.03, lambda_CTR=0.01):
+    with tf.GradientTape() as tape:
+        reconstruction, inputs_reshaped, hidden, classification = model(inputs)
+        loss_value = CTR_loss(inputs_reshaped, reconstruction, lables, classification, model, hidden, lambda_rec,
+                              lambda_cla, lambda_CTR)
+    return loss_value, tape.gradient(loss_value,
+                                     model.trainable_variables), inputs_reshaped, reconstruction, classification
+
+
+#
 def CLS_autoencoder_training(x_train, y_train, num_epochs=200,
                              batch_size=128, learning_rate=0.001, momentum=0.9,
                              num_classes=5, hidden_units=10, bottleneck_units=3):
     model = CLS_AutoEncoder(num_classes, hidden_units, bottleneck_units)
     optimizer = tf.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
-    # lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=learning_rate, decay_steps=num_epochs,
+    dov# lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=learning_rate, decay_steps=num_epochs,
     #                                                              decay_rate=0.8)
     # optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
     global_step = tf.Variable(0)
@@ -128,6 +151,30 @@ def CLS_autoencoder_training(x_train, y_train, num_epochs=200,
         loss_value_final = tf.reduce_sum(loss_value)
     return model, loss_value_final
 
+def CLS_CTR_autoencoder_training(x_train, y_train, num_epochs=200,
+                             batch_size=128, learning_rate=0.001, momentum=0.9,
+                             num_classes=5, hidden_units=10, bottleneck_units=3,
+                             lambda_rec=0.01, lambda_cla=0.03, lambda_CTR=0.01):
+
+    model = CLS_AutoEncoder(num_classes, hidden_units, bottleneck_units)
+    optimizer = tf.optimizers.Adam(learning_rate=learning_rate,weight_decay=0.01)#, momentum=momentum)
+    # lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(initial_learning_rate=learning_rate, decay_steps=num_epochs,
+    #                                                              decay_rate=0.8)
+    # optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
+    global_step = tf.Variable(0)
+
+    for epoch in range(num_epochs):
+        print('Epoch:', epoch)
+        for i in range(0, len(x_train), batch_size):
+            x_inp = x_train[i: i + batch_size]
+            y_inp = y_train[i: i + batch_size]
+            loss_value, grad, inputs_reshaped, reconstruction, classification = CTR_grads(model, x_inp, y_inp, lambda_rec=lambda_rec,
+                                                                                      lambda_cla=lambda_cla, lambda_CTR=lambda_CTR)
+            optimizer.apply_gradients(zip(grad, model.trainable_variables))
+
+        print("Step: {}, Loss: {}".format(global_step.numpy(), tf.reduce_sum(loss_value)))
+        loss_value_final = tf.reduce_sum(loss_value)
+    return model, loss_value_final
 
 def test_CLS_Autoencoder(model, x_test, y_test):
     # Perform model predictions

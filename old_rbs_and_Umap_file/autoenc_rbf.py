@@ -8,7 +8,7 @@ from chemical_brother.data_maker import DataMaker, ChemicalClass
 from chemical_brother.deep_clustering import DeepClustering
 import tensorflow as tf
 
-from chemical_brother.loss import SilhouetteLoss
+from chemical_brother.old_stuf_di_carlo.loss import SilhouetteLoss
 
 
 def main():
